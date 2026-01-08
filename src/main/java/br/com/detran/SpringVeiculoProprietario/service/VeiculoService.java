@@ -1,7 +1,10 @@
 package br.com.detran.SpringVeiculoProprietario.service;
 
 import br.com.detran.SpringVeiculoProprietario.model.Veiculo;
+import br.com.detran.SpringVeiculoProprietario.repository.ProprietarioRepository;
 import br.com.detran.SpringVeiculoProprietario.repository.VeiculoRepository;
+import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,9 +14,11 @@ import java.util.Optional;
 public class VeiculoService {
 
     private final VeiculoRepository veiculoRepository;
+    private final ProprietarioRepository proprietarioRepository;
 
-    public VeiculoService(VeiculoRepository veiculoRepository) {
+    public VeiculoService(VeiculoRepository veiculoRepository, ProprietarioRepository proprietarioRepository) {
         this.veiculoRepository = veiculoRepository;
+        this.proprietarioRepository = proprietarioRepository;
     }
 
     // Listar todos os veículos
@@ -51,15 +56,10 @@ public class VeiculoService {
 
     // Atualizar veículo existente
     public Veiculo update(Long id, Veiculo veiculo) {
+
         Veiculo existente = veiculoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
 
-        // Atualiza campos
-        existente.setPlaca(veiculo.getPlaca());
-        existente.setRenavam(veiculo.getRenavam());
-        existente.setProprietario(veiculo.getProprietario());
-
-        // Verificar duplicidade de placa se mudou
         if (!existente.getPlaca().equals(veiculo.getPlaca())) {
             if (veiculoRepository.findByPlaca(veiculo.getPlaca()).isPresent()) {
                 throw new RuntimeException("Placa já cadastrada!");
@@ -67,12 +67,15 @@ public class VeiculoService {
             existente.setPlaca(veiculo.getPlaca());
         }
 
-        // Verificar duplicidade de RENAVAM se mudou
         if (!existente.getRenavam().equals(veiculo.getRenavam())) {
             if (veiculoRepository.findByRenavam(veiculo.getRenavam()).isPresent()) {
                 throw new RuntimeException("RENAVAM já cadastrado!");
             }
             existente.setRenavam(veiculo.getRenavam());
+        }
+
+        if (veiculo.getProprietario() != null) {
+            existente.setProprietario(veiculo.getProprietario());
         }
 
         return veiculoRepository.save(existente);
@@ -84,4 +87,21 @@ public class VeiculoService {
                 .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
         veiculoRepository.delete(existente);
     }
+
+    public Veiculo createComProprietario(Long proprietarioId, Veiculo veiculo) {
+
+        Proprietario proprietario = proprietarioRepository.findById(proprietarioId)
+                .orElseThrow(() -> new RuntimeException("Proprietário não encontrado"));
+
+        if (veiculoRepository.findByPlaca(veiculo.getPlaca()).isPresent())
+            throw new RuntimeException("Placa já cadastrada");
+
+        if (veiculoRepository.findByRenavam(veiculo.getRenavam()).isPresent())
+            throw new RuntimeException("RENAVAM já cadastrado");
+
+        veiculo.setProprietario(proprietario);
+
+        return veiculoRepository.save(veiculo);
+    }
+
 }

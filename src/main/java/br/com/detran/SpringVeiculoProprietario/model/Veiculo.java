@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 @Entity
 @Table(name = "veiculo")
 @Data
@@ -23,6 +25,7 @@ public class Veiculo {
     private String renavam;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "id_prop", nullable = false)
     private Proprietario proprietario;
 }

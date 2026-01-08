@@ -2,9 +2,11 @@ package br.com.detran.SpringVeiculoProprietario.repository;
 
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+@Repository
 public interface ProprietarioRepository extends JpaRepository<Proprietario, Long> { //Crie automaticamente uma classe que sabe salvar, buscar, atualizar e deletar objetos Proprietario cujo ID é Long.
     //Quero um repositório que trabalhe com a entidade Proprietario, cujo identificador é do tipo Long
     Optional<Proprietario> findByCpfCnpj(String cpfCnpj);

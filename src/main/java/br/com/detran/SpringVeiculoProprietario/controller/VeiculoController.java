@@ -49,9 +49,10 @@ public class VeiculoController {
 
     @PostMapping
     // Cria novo veículo
-    public ResponseEntity<Veiculo> create(@RequestBody Veiculo veiculo) {
+    public ResponseEntity<Veiculo> create(@RequestBody Veiculo veiculo) { //@RequestBody pede para mandar no corpo da requisição os atributos de Veiculo.
         Veiculo criado = veiculoService.create(veiculo);
         return ResponseEntity.ok(criado);
+
     }
 
     @PutMapping("/{id}")
@@ -66,5 +67,12 @@ public class VeiculoController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         veiculoService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/proprietario/{proprietarioId}")
+    public ResponseEntity<Veiculo> createComProprietario(@PathVariable Long proprietarioId,
+                                                         @RequestBody Veiculo veiculo) {
+        Veiculo criado = veiculoService.createComProprietario(proprietarioId, veiculo);
+        return ResponseEntity.ok(criado);
     }
 }

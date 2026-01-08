@@ -1,6 +1,7 @@
 package br.com.detran.SpringVeiculoProprietario.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -42,5 +43,6 @@ public class Proprietario {
     private String endereco;
 
     @OneToMany(mappedBy = "proprietario") // mappedBy = "proprietario" se refere ao atributo "private Proprietario proprietario" em Veiculo.java.
+    @JsonManagedReference
     private List<Veiculo> veiculos = new ArrayList<>();
 }
