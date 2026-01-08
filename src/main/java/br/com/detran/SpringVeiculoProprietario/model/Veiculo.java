@@ -16,10 +16,10 @@ public class Veiculo {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 7)
+    @Column(nullable = false, length = 7, unique = true)
     private String placa;
 
-    @Column(nullable = false, length = 11)
+    @Column(nullable = false, length = 11, unique = true)
     private String renavam;
 
     @ManyToOne

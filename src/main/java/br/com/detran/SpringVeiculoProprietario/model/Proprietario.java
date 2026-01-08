@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity //JPA
 @Table(name = "proprietario") //JPA
@@ -32,7 +33,7 @@ public class Proprietario {
      */
 
     @Column(name = "cpf_cnpj", length = 14, nullable = false, unique = true) //JPA
-    private int cpfCnpj;
+    private String cpfCnpj;
 
     @Column(nullable = false, length = 100)
     private String nome;
@@ -41,5 +42,5 @@ public class Proprietario {
     private String endereco;
 
     @OneToMany(mappedBy = "proprietario") // mappedBy = "proprietario" se refere ao atributo "private Proprietario propietario" em Veiculo.java.
-    private List<Veiculo> veiculos;
+    private List<Veiculo> veiculos = new ArrayList<>();
 }
