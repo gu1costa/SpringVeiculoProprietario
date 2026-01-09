@@ -47,7 +47,7 @@ public class VeiculoController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/criar")
     // Cria novo veículo
     public ResponseEntity<Veiculo> create(@RequestBody Veiculo veiculo) { //@RequestBody pede para mandar no corpo da requisição os atributos de Veiculo.
         Veiculo criado = veiculoService.create(veiculo);
@@ -55,14 +55,14 @@ public class VeiculoController {
 
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     // Atualiza veículo existente
     public ResponseEntity<Veiculo> update(@PathVariable Long id, @RequestBody Veiculo veiculo) {
         Veiculo atualizado = veiculoService.update(id, veiculo);
         return ResponseEntity.ok(atualizado);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletar/{id}")
     // Deleta veículo pelo ID
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         veiculoService.delete(id);
