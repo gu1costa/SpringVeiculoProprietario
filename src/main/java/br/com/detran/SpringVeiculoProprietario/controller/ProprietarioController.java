@@ -45,7 +45,7 @@ public class ProprietarioController {
     }
 
     //Criar novo proprietário.
-    @PostMapping
+    @PostMapping("/cadastrar")
     // Recebe um JSON do Proprietário no corpo da requisição e cria o registro no banco
     public ResponseEntity<Proprietario> create(@RequestBody Proprietario proprietario){
         Proprietario criado = proprietarioService.create(proprietario);
@@ -53,7 +53,7 @@ public class ProprietarioController {
     }
 
     // Atualizar proprietário existente
-    @PutMapping("/{id}")
+    @PutMapping("/atualizar/{id}")
     // Atualiza os dados do Proprietário pelo ID; retorna 200 OK com o objeto atualizado
     public ResponseEntity<Proprietario> update(@PathVariable Long id, @RequestBody Proprietario proprietario) {
         Proprietario atualizado = proprietarioService.update(id, proprietario);
@@ -61,7 +61,7 @@ public class ProprietarioController {
     }
 
     // Deletar proprietário
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletar/{id}")
     // Deleta o Proprietário pelo ID; retorna 204 No Content se deletado com sucesso
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         proprietarioService.delete(id);
