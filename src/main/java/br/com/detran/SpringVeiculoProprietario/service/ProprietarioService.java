@@ -1,5 +1,6 @@
 package br.com.detran.SpringVeiculoProprietario.service;
 
+import br.com.detran.SpringVeiculoProprietario.exception.DuplicateCpfCnpjException;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.repository.ProprietarioRepository;
 import org.springframework.stereotype.Service;
@@ -38,7 +39,7 @@ public class ProprietarioService {
     public Proprietario create(Proprietario proprietario){
         //Verificação se já existe um proprietário com o mesmo CPF/CNPJ.
         if(proprietarioRepository.findByCpfCnpj(proprietario.getCpfCnpj()).isPresent()){ //Se um proprietarioRepository.findByCpfCpnj(verificação se o CPF/CNPJ já está presente for verdadeiro): lança uma exceção RuntimeException com aquela mensagem.
-            throw new RuntimeException("CPF/CNPJ já cadastrado!");
+            throw new DuplicateCpfCnpjException("CPF/CNPJ já cadastrado!");
         }
         return proprietarioRepository.save(proprietario); //e o CPF/CNPJ não existir, o método chama save(proprietario) do JpaRepository, que: Insere o Proprietário no banco de dados (INSERT). Gera automaticamente o id do Proprietário (porque usamos @GeneratedValue).
     }
