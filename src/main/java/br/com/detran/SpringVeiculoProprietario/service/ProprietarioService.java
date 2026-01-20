@@ -34,7 +34,7 @@ public class ProprietarioService {
         return proprietarioRepository.findByCpfCnpj(cpfCnpj);
     }
 
-    //Criar um novo proprietário.
+    /// Criar um novo proprietário.
     public Proprietario create(Proprietario proprietario){
         //Verificação se já existe um proprietário com o mesmo CPF/CNPJ.
         if(proprietarioRepository.findByCpfCnpj(proprietario.getCpfCnpj()).isPresent()){ //Se um proprietarioRepository.findByCpfCpnj(verificação se o CPF/CNPJ já está presente for verdadeiro): lança uma exceção RuntimeException com aquela mensagem.

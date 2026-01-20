@@ -41,6 +41,11 @@ public class VeiculoService {
         return veiculoRepository.findByRenavam(renavam);
     }
 
+    // Listar por Proprietário.
+    public List<Veiculo> listarPorProprietario(Long proprietarioId) {
+        return veiculoRepository.findByProprietarioId(proprietarioId);
+    }
+
     // Criar novo veículo
     public Veiculo create(Veiculo veiculo) {
         // Validação de placa

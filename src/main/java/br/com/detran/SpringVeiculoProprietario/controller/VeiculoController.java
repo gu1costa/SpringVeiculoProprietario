@@ -5,7 +5,7 @@ import br.com.detran.SpringVeiculoProprietario.service.VeiculoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-        import java.util.List;
+import java.util.List;
 
 @RestController
 @RequestMapping("/veiculos")
@@ -45,6 +45,12 @@ public class VeiculoController {
         return veiculoService.getByRenavam(renavam)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/proprietario/{proprietarioId}")
+    // Lista os veículos de um proprietário específico
+    public ResponseEntity<List<Veiculo>> listarPorProprietario(@PathVariable Long proprietarioId) {
+        return ResponseEntity.ok(veiculoService.listarPorProprietario(proprietarioId));
     }
 
     @PostMapping("/criar")
