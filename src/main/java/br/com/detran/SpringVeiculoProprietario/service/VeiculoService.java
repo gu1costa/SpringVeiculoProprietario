@@ -1,10 +1,11 @@
 package br.com.detran.SpringVeiculoProprietario.service;
 
+import br.com.detran.SpringVeiculoProprietario.exception.BusinessException;
+import br.com.detran.SpringVeiculoProprietario.exception.ResourceNotFoundException;
+import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.model.Veiculo;
 import br.com.detran.SpringVeiculoProprietario.repository.ProprietarioRepository;
 import br.com.detran.SpringVeiculoProprietario.repository.VeiculoRepository;
-import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,92 +22,90 @@ public class VeiculoService {
         this.proprietarioRepository = proprietarioRepository;
     }
 
-    // Listar todos os veículos
+    private String normalizarPlaca(String placa) {
+        if (placa == null) return null;
+        return placa.trim().toUpperCase();
+    }
+
+    private String normalizarRenavam(String renavam) {
+        if (renavam == null) return null;
+        return renavam.trim();
+    }
+
     public List<Veiculo> getAll() {
         return veiculoRepository.findAll();
     }
 
-    // Buscar veículo pelo ID
     public Optional<Veiculo> getById(Long id) {
         return veiculoRepository.findById(id);
     }
 
-    // Buscar veículo pela placa
     public Optional<Veiculo> getByPlaca(String placa) {
-        return veiculoRepository.findByPlaca(placa);
+        return veiculoRepository.findByPlaca(normalizarPlaca(placa));
     }
 
-    // Buscar veículo pelo RENAVAM
     public Optional<Veiculo> getByRenavam(String renavam) {
-        return veiculoRepository.findByRenavam(renavam);
+        return veiculoRepository.findByRenavam(normalizarRenavam(renavam));
     }
 
-    // Listar por Proprietário.
     public List<Veiculo> listarPorProprietario(Long proprietarioId) {
+        if(!proprietarioRepository.existsById(proprietarioId)){
+            throw new ResourceNotFoundException("Proprietário não encontrado.");
+        }
         return veiculoRepository.findByProprietarioId(proprietarioId);
     }
 
-    // Criar novo veículo
     public Veiculo create(Veiculo veiculo) {
-        // Validação de placa
+        throw new BusinessException("Veículo precisa estar vinculado a um proprietário.");
+    }
+
+    public Veiculo createComProprietario(Long proprietarioId, Veiculo veiculo) {
+        Proprietario proprietario = proprietarioRepository.findById(proprietarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("Proprietário não encontrado."));
+
+        veiculo.setPlaca(normalizarPlaca(veiculo.getPlaca()));
+        veiculo.setRenavam(normalizarRenavam(veiculo.getRenavam()));
+
         if (veiculoRepository.findByPlaca(veiculo.getPlaca()).isPresent()) {
-            throw new RuntimeException("Placa já cadastrada!");
+            throw new BusinessException("Placa já cadastrada.");
         }
-        // Validação de RENAVAM
+
         if (veiculoRepository.findByRenavam(veiculo.getRenavam()).isPresent()) {
-            throw new RuntimeException("RENAVAM já cadastrado!");
+            throw new BusinessException("RENAVAM já cadastrado.");
         }
+
+        veiculo.setProprietario(proprietario);
         return veiculoRepository.save(veiculo);
     }
 
-    // Atualizar veículo existente
     public Veiculo update(Long id, Veiculo veiculo) {
 
         Veiculo existente = veiculoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado."));
 
-        if (!existente.getPlaca().equals(veiculo.getPlaca())) {
-            if (veiculoRepository.findByPlaca(veiculo.getPlaca()).isPresent()) {
-                throw new RuntimeException("Placa já cadastrada!");
+        String novaPlaca = veiculo.getPlaca() != null ? veiculo.getPlaca().trim().toUpperCase() : null;
+        String novoRenavam = veiculo.getRenavam() != null ? veiculo.getRenavam().trim() : null;
+
+        if (novaPlaca != null && !novaPlaca.equals(existente.getPlaca())) {
+            if (veiculoRepository.existsByPlacaAndIdNot(novaPlaca, id)) {
+                throw new BusinessException("Placa já cadastrada.");
             }
-            existente.setPlaca(veiculo.getPlaca());
+            existente.setPlaca(novaPlaca);
         }
 
-        if (!existente.getRenavam().equals(veiculo.getRenavam())) {
-            if (veiculoRepository.findByRenavam(veiculo.getRenavam()).isPresent()) {
-                throw new RuntimeException("RENAVAM já cadastrado!");
+        if (novoRenavam != null && !novoRenavam.equals(existente.getRenavam())) {
+            if (veiculoRepository.existsByRenavamAndIdNot(novoRenavam, id)) {
+                throw new BusinessException("RENAVAM já cadastrado.");
             }
-            existente.setRenavam(veiculo.getRenavam());
-        }
-
-        if (veiculo.getProprietario() != null) {
-            existente.setProprietario(veiculo.getProprietario());
+            existente.setRenavam(novoRenavam);
         }
 
         return veiculoRepository.save(existente);
     }
 
-    // Deletar veículo
     public void delete(Long id) {
         Veiculo existente = veiculoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Veículo não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Veículo não encontrado."));
         veiculoRepository.delete(existente);
     }
-
-    public Veiculo createComProprietario(Long proprietarioId, Veiculo veiculo) {
-
-        Proprietario proprietario = proprietarioRepository.findById(proprietarioId)
-                .orElseThrow(() -> new RuntimeException("Proprietário não encontrado"));
-
-        if (veiculoRepository.findByPlaca(veiculo.getPlaca()).isPresent())
-            throw new RuntimeException("Placa já cadastrada");
-
-        if (veiculoRepository.findByRenavam(veiculo.getRenavam()).isPresent())
-            throw new RuntimeException("RENAVAM já cadastrado");
-
-        veiculo.setProprietario(proprietario);
-
-        return veiculoRepository.save(veiculo);
-    }
-
 }

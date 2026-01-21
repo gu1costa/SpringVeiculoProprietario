@@ -7,9 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ProprietarioRepository extends JpaRepository<Proprietario, Long> { //Crie automaticamente uma classe que sabe salvar, buscar, atualizar e deletar objetos Proprietario cujo ID é Long.
-    //Quero um repositório que trabalhe com a entidade Proprietario, cujo identificador é do tipo Long
+public interface ProprietarioRepository extends JpaRepository<Proprietario, Long> {
+
     Optional<Proprietario> findByCpfCnpj(String cpfCnpj);
+
+    boolean existsByCpfCnpj(String cpfCnpj);
+
+    boolean existsByCpfCnpjAndIdNot(String cpfCnpj, Long id);
+}
 
     /*
     O Optional é usado para representar o resultado de uma consulta que pode ou não existir, eliminando retornos null e
@@ -21,7 +26,3 @@ public interface ProprietarioRepository extends JpaRepository<Proprietario, Long
     indica que o CPF já está cadastrado; se não existir, está disponível para cadastro.
     Não altera a obrigatoriedade do campo na entidade.
      */
-
-}
-
-

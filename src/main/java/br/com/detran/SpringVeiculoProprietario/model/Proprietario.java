@@ -34,6 +34,11 @@ public class Proprietario {
     )
      */
 
+    @NotBlank(message = "CPF/CNPJ é obrigatório.")
+    @Pattern(
+            regexp = "^\\d{11}$|^\\d{14}$",
+            message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos."
+    )
     @Size(min = 11, max = 14, message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos") // JPA
     @Column(name = "cpf_cnpj", length = 14, nullable = false, unique = true) //JPA
     private String cpfCnpj;
