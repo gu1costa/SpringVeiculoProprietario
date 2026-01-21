@@ -53,14 +53,6 @@ public class VeiculoController {
         return ResponseEntity.ok(veiculoService.listarPorProprietario(proprietarioId));
     }
 
-    @PostMapping("/criar")
-    // Cria novo veículo
-    public ResponseEntity<Veiculo> create(@RequestBody Veiculo veiculo) { //@RequestBody pede para mandar no corpo da requisição os atributos de Veiculo.
-        Veiculo criado = veiculoService.create(veiculo);
-        return ResponseEntity.ok(criado);
-
-    }
-
     @PutMapping("/atualizar/{id}")
     // Atualiza veículo existente
     public ResponseEntity<Veiculo> update(@PathVariable Long id, @RequestBody Veiculo veiculo) {
@@ -77,7 +69,7 @@ public class VeiculoController {
 
     @PostMapping("/proprietario/{proprietarioId}")
     public ResponseEntity<Veiculo> createComProprietario(@PathVariable Long proprietarioId,
-                                                         @RequestBody Veiculo veiculo) {
+                                                         @RequestBody Veiculo veiculo) { //@RequestBody pede para mandar no corpo da requisição os atributos de Veiculo.
         Veiculo criado = veiculoService.createComProprietario(proprietarioId, veiculo);
         return ResponseEntity.ok(criado);
     }
