@@ -1,6 +1,7 @@
 package br.com.detran.SpringVeiculoProprietario.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ public class Proprietario {
     )
      */
 
+    @Size(min = 11, max = 14, message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos") // JPA
     @Column(name = "cpf_cnpj", length = 14, nullable = false, unique = true) //JPA
     private String cpfCnpj;
 

@@ -2,17 +2,20 @@ package br.com.detran.SpringVeiculoProprietario.controller;
 
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.service.ProprietarioService;
-
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/proprietarios")
 public class ProprietarioController {
 
-    //Injeção de dependência.
     private final ProprietarioService proprietarioService;
 
     public ProprietarioController(ProprietarioService proprietarioService) {
@@ -20,49 +23,44 @@ public class ProprietarioController {
     }
 
     @GetMapping
-    //Retorna uma lista de Proprietários porque podem existir vários registros no banco.
     public ResponseEntity<List<Proprietario>> findAll() {
         return ResponseEntity.ok(proprietarioService.getAll());
     }
 
     @GetMapping("/{id}")
-    /*
-    @PathVariable pega o valor do ID da URL; getById() retorna Optional para tratar se existir ou não;
-    map(ResponseEntity::ok) retorna 200 OK se existir, orElse(...) retorna 404 Not Found se não existir
-     */
-    public ResponseEntity<Proprietario> getById(@PathVariable Long id){
+    public ResponseEntity<Proprietario> getById(@PathVariable Long id) {
         return proprietarioService.getById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/cpf/{cpfCnpj}")
-    //Busca um proprietário pelo CPF/CNPJ, retorna 200 OK se encontrado, 404 se não encontrado.
-    public ResponseEntity<Proprietario> getByCpfCnpj(@PathVariable String cpfCnpj){
+    public ResponseEntity<Proprietario> getByCpfCnpj(
+            @PathVariable
+            @Pattern(regexp = "\\d{11}|\\d{14}", message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos")
+            String cpfCnpj
+    ) {
         return proprietarioService.getByCpfCnpj(cpfCnpj)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //Criar novo proprietário.
     @PostMapping("/cadastrar")
-    // Recebe um JSON do Proprietário no corpo da requisição e cria o registro no banco
-    public ResponseEntity<Proprietario> create(@RequestBody Proprietario proprietario){
+    public ResponseEntity<Proprietario> create(@RequestBody @Valid Proprietario proprietario) {
         Proprietario criado = proprietarioService.create(proprietario);
-        return ResponseEntity.ok(criado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
     }
 
-    // Atualizar proprietário existente
     @PutMapping("/atualizar/{id}")
-    // Atualiza os dados do Proprietário pelo ID; retorna 200 OK com o objeto atualizado
-    public ResponseEntity<Proprietario> update(@PathVariable Long id, @RequestBody Proprietario proprietario) {
+    public ResponseEntity<Proprietario> update(
+            @PathVariable Long id,
+            @RequestBody @Valid Proprietario proprietario
+    ) {
         Proprietario atualizado = proprietarioService.update(id, proprietario);
         return ResponseEntity.ok(atualizado);
     }
 
-    // Deletar proprietário
     @DeleteMapping("/deletar/{id}")
-    // Deleta o Proprietário pelo ID; retorna 204 No Content se deletado com sucesso
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         proprietarioService.delete(id);
         return ResponseEntity.noContent().build();
