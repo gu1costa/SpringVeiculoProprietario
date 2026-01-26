@@ -1,5 +1,8 @@
 package br.com.detran.SpringVeiculoProprietario.controller;
 
+import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioRequestDTO;
+import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioResponseDTO;
+import br.com.detran.SpringVeiculoProprietario.mapper.ProprietarioMapper;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.service.ProprietarioService;
 import jakarta.validation.Valid;
@@ -10,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Validated
 @RestController
@@ -23,41 +27,55 @@ public class ProprietarioController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Proprietario>> findAll() {
-        return ResponseEntity.ok(proprietarioService.getAll());
+    public ResponseEntity<List<ProprietarioResponseDTO>> findAll() {
+        List<ProprietarioResponseDTO> lista = proprietarioService.getAll().stream()
+                .map(ProprietarioMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Proprietario> getById(@PathVariable Long id) {
+    public ResponseEntity<ProprietarioResponseDTO> getById(@PathVariable Long id) {
         return proprietarioService.getById(id)
+                .map(ProprietarioMapper::toResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/cpf/{cpfCnpj}")
-    public ResponseEntity<Proprietario> getByCpfCnpj(
+    public ResponseEntity<ProprietarioResponseDTO> getByCpfCnpj(
             @PathVariable
             @Pattern(regexp = "\\d{11}|\\d{14}", message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos")
             String cpfCnpj
     ) {
         return proprietarioService.getByCpfCnpj(cpfCnpj)
+                .map(ProprietarioMapper::toResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<Proprietario> create(@RequestBody @Valid Proprietario proprietario) {
+    public ResponseEntity<ProprietarioResponseDTO> create(@RequestBody @Valid ProprietarioRequestDTO proprietarioDto) {
+        Proprietario proprietario = ProprietarioMapper.toEntity(proprietarioDto);
+
         Proprietario criado = proprietarioService.create(proprietario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
+
+        ProprietarioResponseDTO response = ProprietarioMapper.toResponseDTO(criado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Proprietario> update(
+    public ResponseEntity<ProprietarioResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody @Valid Proprietario proprietario
+            @RequestBody @Valid ProprietarioRequestDTO proprietarioDto
     ) {
+        Proprietario proprietario = ProprietarioMapper.toEntity(proprietarioDto);
+
         Proprietario atualizado = proprietarioService.update(id, proprietario);
-        return ResponseEntity.ok(atualizado);
+
+        ProprietarioResponseDTO response = ProprietarioMapper.toResponseDTO(atualizado);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/deletar/{id}")

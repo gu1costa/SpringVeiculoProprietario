@@ -1,5 +1,8 @@
 package br.com.detran.SpringVeiculoProprietario.controller;
 
+import br.com.detran.SpringVeiculoProprietario.dto.VeiculoRequestDTO;
+import br.com.detran.SpringVeiculoProprietario.dto.VeiculoResponseDTO;
+import br.com.detran.SpringVeiculoProprietario.mapper.VeiculoMapper;
 import br.com.detran.SpringVeiculoProprietario.model.Veiculo;
 import br.com.detran.SpringVeiculoProprietario.service.VeiculoService;
 import jakarta.validation.Valid;
@@ -8,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/veiculos")
@@ -20,52 +24,71 @@ public class VeiculoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Veiculo>> findAll() {
-        return ResponseEntity.ok(veiculoService.getAll());
+    public ResponseEntity<List<VeiculoResponseDTO>> findAll() {
+        List<VeiculoResponseDTO> lista = veiculoService.getAll().stream()
+                .map(VeiculoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Veiculo> getById(@PathVariable Long id) {
+    public ResponseEntity<VeiculoResponseDTO> getById(@PathVariable Long id) {
         return veiculoService.getById(id)
+                .map(VeiculoMapper::toResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/placa/{placa}")
-    public ResponseEntity<Veiculo> getByPlaca(@PathVariable String placa) {
+    public ResponseEntity<VeiculoResponseDTO> getByPlaca(@PathVariable String placa) {
         return veiculoService.getByPlaca(placa)
+                .map(VeiculoMapper::toResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/renavam/{renavam}")
-    public ResponseEntity<Veiculo> getByRenavam(@PathVariable String renavam) {
+    public ResponseEntity<VeiculoResponseDTO> getByRenavam(@PathVariable String renavam) {
         return veiculoService.getByRenavam(renavam)
+                .map(VeiculoMapper::toResponseDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/proprietario/{proprietarioId}")
-    public ResponseEntity<List<Veiculo>> listarPorProprietario(@PathVariable Long proprietarioId) {
-        return ResponseEntity.ok(veiculoService.listarPorProprietario(proprietarioId));
+    public ResponseEntity<List<VeiculoResponseDTO>> listarPorProprietario(@PathVariable Long proprietarioId) {
+        List<VeiculoResponseDTO> lista = veiculoService.listarPorProprietario(proprietarioId).stream()
+                .map(VeiculoMapper::toResponseDTO)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(lista);
     }
 
     @PostMapping("/proprietario/{proprietarioId}")
-    public ResponseEntity<Veiculo> createComProprietario(
+    public ResponseEntity<VeiculoResponseDTO> createComProprietario(
             @PathVariable Long proprietarioId,
-            @RequestBody @Valid Veiculo veiculo
+            @RequestBody @Valid VeiculoRequestDTO veiculoDto
     ) {
+        Veiculo veiculo = VeiculoMapper.toEntity(veiculoDto);
+
         Veiculo criado = veiculoService.createComProprietario(proprietarioId, veiculo);
-        return ResponseEntity.status(HttpStatus.CREATED).body(criado);
+
+        VeiculoResponseDTO response = VeiculoMapper.toResponseDTO(criado);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/atualizar/{id}")
-    public ResponseEntity<Veiculo> update(
+    public ResponseEntity<VeiculoResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody @Valid Veiculo veiculo
+            @RequestBody @Valid VeiculoRequestDTO veiculoDto
     ) {
+        Veiculo veiculo = VeiculoMapper.toEntity(veiculoDto);
+
         Veiculo atualizado = veiculoService.update(id, veiculo);
-        return ResponseEntity.ok(atualizado);
+
+        VeiculoResponseDTO response = VeiculoMapper.toResponseDTO(atualizado);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/deletar/{id}")
