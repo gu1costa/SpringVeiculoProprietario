@@ -49,7 +49,7 @@ public class Proprietario {
     @Column(nullable = false)
     private String endereco;
 
-    @OneToMany(mappedBy = "proprietario") // mappedBy = "proprietario" se refere ao atributo "private Proprietario proprietario" em Veiculo.java.
-    @JsonManagedReference
-    private List<Veiculo> veiculos = new ArrayList<>();
+//    @OneToMany(mappedBy = "proprietario") // mappedBy = "proprietario" se refere ao atributo "private Proprietario proprietario" em Veiculo.java.
+//    @JsonManagedReference
+//    private List<Veiculo> veiculos = new ArrayList<>();
 }

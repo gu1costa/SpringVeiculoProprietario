@@ -4,6 +4,7 @@ import br.com.detran.SpringVeiculoProprietario.exception.BusinessException;
 import br.com.detran.SpringVeiculoProprietario.exception.ResourceNotFoundException;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.repository.ProprietarioRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -50,17 +51,23 @@ public class ProprietarioService {
         Proprietario existente = proprietarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Proprietário não encontrado."));
 
-        String novoCpfCnpj = normalizarCpfCnpj(proprietario.getCpfCnpj());
+//        String novoCpfCnpj = normalizarCpfCnpj(proprietario.getCpfCnpj());
 
-        if (novoCpfCnpj != null && !novoCpfCnpj.equals(existente.getCpfCnpj())) {
-            if (proprietarioRepository.existsByCpfCnpjAndIdNot(novoCpfCnpj, id)) {
-                throw new BusinessException("CPF/CNPJ já cadastrado.");
-            }
-            existente.setCpfCnpj(novoCpfCnpj);
+//        if (novoCpfCnpj != null && !novoCpfCnpj.equals(existente.getCpfCnpj())) {
+//            if (proprietarioRepository.existsByCpfCnpjAndIdNot(novoCpfCnpj, id)) {
+//                throw new BusinessException("CPF/CNPJ já cadastrado.");
+//            }
+//            existente.setCpfCnpj(novoCpfCnpj);
+//        }
+
+        if (StringUtils.isNotBlank(existente.getNome())) {
+            existente.setNome(proprietario.getNome());
+
         }
 
-        existente.setNome(proprietario.getNome());
-        existente.setEndereco(proprietario.getEndereco());
+        if (StringUtils.isNotBlank(existente.getCpfCnpj())) {
+            existente.setEndereco(proprietario.getEndereco());
+        }
 
         return proprietarioRepository.save(existente);
     }
