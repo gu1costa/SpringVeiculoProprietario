@@ -2,6 +2,7 @@ package br.com.detran.SpringVeiculoProprietario.controller;
 
 import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioRequestDTO;
 import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioResponseDTO;
+import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioUpdateDTO;
 import br.com.detran.SpringVeiculoProprietario.mapper.ProprietarioMapper;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.service.ProprietarioService;
@@ -58,7 +59,6 @@ public class ProprietarioController {
     @PostMapping("/cadastrar")
     public ResponseEntity<ProprietarioResponseDTO> create(@RequestBody @Valid ProprietarioRequestDTO proprietarioDto) {
         Proprietario proprietario = ProprietarioMapper.toEntity(proprietarioDto);
-
         Proprietario criado = proprietarioService.create(proprietario);
 
         ProprietarioResponseDTO response = ProprietarioMapper.toResponseDTO(criado);
@@ -68,11 +68,9 @@ public class ProprietarioController {
     @PutMapping("/atualizar/{id}")
     public ResponseEntity<ProprietarioResponseDTO> update(
             @PathVariable Long id,
-            @RequestBody @Valid ProprietarioRequestDTO proprietarioDto
+            @RequestBody @Valid ProprietarioUpdateDTO proprietarioDto
     ) {
-        Proprietario proprietario = ProprietarioMapper.toEntity(proprietarioDto);
-
-        Proprietario atualizado = proprietarioService.update(id, proprietario);
+        Proprietario atualizado = proprietarioService.update(id, proprietarioDto);
 
         ProprietarioResponseDTO response = ProprietarioMapper.toResponseDTO(atualizado);
         return ResponseEntity.ok(response);

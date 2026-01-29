@@ -1,7 +1,9 @@
 package br.com.detran.SpringVeiculoProprietario.service;
 
+import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioUpdateDTO;
 import br.com.detran.SpringVeiculoProprietario.exception.BusinessException;
 import br.com.detran.SpringVeiculoProprietario.exception.ResourceNotFoundException;
+import br.com.detran.SpringVeiculoProprietario.mapper.ProprietarioMapper;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import br.com.detran.SpringVeiculoProprietario.repository.ProprietarioRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -21,7 +23,8 @@ public class ProprietarioService {
 
     private String normalizarCpfCnpj(String cpfCnpj) {
         if (cpfCnpj == null) return null;
-        return cpfCnpj.trim();
+        String v = cpfCnpj.trim();
+        return v.isBlank() ? null : v;
     }
 
     public List<Proprietario> getAll() {
@@ -38,6 +41,11 @@ public class ProprietarioService {
 
     public Proprietario create(Proprietario proprietario) {
         String cpfCnpj = normalizarCpfCnpj(proprietario.getCpfCnpj());
+
+        if (StringUtils.isBlank(cpfCnpj)) {
+            throw new BusinessException("CPF/CNPJ é obrigatório.");
+        }
+
         proprietario.setCpfCnpj(cpfCnpj);
 
         if (proprietarioRepository.existsByCpfCnpj(cpfCnpj)) {
@@ -47,27 +55,12 @@ public class ProprietarioService {
         return proprietarioRepository.save(proprietario);
     }
 
-    public Proprietario update(Long id, Proprietario proprietario) {
+    public Proprietario update(Long id, ProprietarioUpdateDTO dto) {
         Proprietario existente = proprietarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Proprietário não encontrado."));
 
-//        String novoCpfCnpj = normalizarCpfCnpj(proprietario.getCpfCnpj());
-
-//        if (novoCpfCnpj != null && !novoCpfCnpj.equals(existente.getCpfCnpj())) {
-//            if (proprietarioRepository.existsByCpfCnpjAndIdNot(novoCpfCnpj, id)) {
-//                throw new BusinessException("CPF/CNPJ já cadastrado.");
-//            }
-//            existente.setCpfCnpj(novoCpfCnpj);
-//        }
-
-        if (StringUtils.isNotBlank(existente.getNome())) {
-            existente.setNome(proprietario.getNome());
-
-        }
-
-        if (StringUtils.isNotBlank(existente.getCpfCnpj())) {
-            existente.setEndereco(proprietario.getEndereco());
-        }
+        // NÃO mexe no cpfCnpj aqui
+        ProprietarioMapper.applyUpdates(existente, dto);
 
         return proprietarioRepository.save(existente);
     }

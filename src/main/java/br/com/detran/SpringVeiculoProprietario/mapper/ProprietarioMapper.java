@@ -2,29 +2,37 @@ package br.com.detran.SpringVeiculoProprietario.mapper;
 
 import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioRequestDTO;
 import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioResponseDTO;
+import br.com.detran.SpringVeiculoProprietario.dto.ProprietarioUpdateDTO;
 import br.com.detran.SpringVeiculoProprietario.exception.BusinessException;
 import br.com.detran.SpringVeiculoProprietario.model.Proprietario;
 import org.apache.commons.lang3.StringUtils;
 
 public class ProprietarioMapper {
+
     public static Proprietario toEntity(ProprietarioRequestDTO dto) {
-        Proprietario proprietario = new Proprietario();
+        Proprietario p = new Proprietario();
+        p.setCpfCnpj(dto.getCpfCnpj());
+        p.setNome(dto.getNome());
+        p.setEndereco(dto.getEndereco());
+        return p;
+    }
 
-//        proprietario.setCpfCnpj(dto.getCpfCnpj());
-
-        if (StringUtils.isNotBlank(dto.getEndereco())) {
-            proprietario.setEndereco(dto.getEndereco());
-        }
+    public static void applyUpdates(Proprietario existente, ProprietarioUpdateDTO dto) {
+        boolean mudou = false;
 
         if (StringUtils.isNotBlank(dto.getNome())) {
-            proprietario.setNome(dto.getNome());
+            existente.setNome(dto.getNome());
+            mudou = true;
         }
 
-        if (StringUtils.isBlank(dto.getEndereco()) && StringUtils.isBlank(dto.getNome())) {
-            throw new BusinessException("Pelo menos um dos campos precisa ser enviado 'ENDERECO' ou 'NOME'.");
+        if (StringUtils.isNotBlank(dto.getEndereco())) {
+            existente.setEndereco(dto.getEndereco());
+            mudou = true;
         }
 
-        return proprietario;
+        if (!mudou) {
+            throw new BusinessException("Envie pelo menos um campo para atualizar: NOME ou ENDERECO.");
+        }
     }
 
     public static ProprietarioResponseDTO toResponseDTO(Proprietario entity) {
