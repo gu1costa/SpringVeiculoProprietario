@@ -1,7 +1,7 @@
 package br.com.detran.SpringVeiculoProprietario.dto;
 
+import br.com.detran.SpringVeiculoProprietario.validation.CpfCnpj;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,10 +13,7 @@ import lombok.NoArgsConstructor;
 public class ProprietarioRequestDTO {
 
     @NotBlank(message = "CPF/CNPJ é obrigatório.")
-    @Pattern(
-            regexp = "^\\d{11}$|^\\d{14}$",
-            message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos."
-    )
+    @CpfCnpj
     @Size(min = 11, max = 14, message = "CPF deve ter 11 dígitos e CNPJ 14 dígitos.")
     private String cpfCnpj;
 
